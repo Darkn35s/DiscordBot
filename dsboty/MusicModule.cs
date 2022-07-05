@@ -36,33 +36,21 @@ namespace dsboty
 
             using (var stream = CreateYoutubeStream(url))
             using (var output = stream.StandardOutput.BaseStream)
-            using (var discord = client.CreatePCMStream(AudioApplication.Mixed, 96000))
+            using (var discord = client.CreatePCMStream(AudioApplication.Mixed, 24000))
                 try { await output.CopyToAsync(discord); }
-                finally { await discord.FlushAsync(); }
+                finally { await discord.FlushAsync();}
 
         }
 
         private Process CreateYoutubeStream(string url)
         {
-            //ProcessStartInfo stream = new ProcessStartInfo
-            //{
-
-            //    FileName = "CMD.exe",
-            //    Arguments = $@"youtube-dl --no-check-certificate -f bestaudio -o - {url} | ffmpeg -i pipe:0 -f s16le -ar 48000 -ac 2 pipe:1",
-            //    UseShellExecute = false,
-            //    RedirectStandardOutput = true,
-            //    CreateNoWindow = false
-            //};
             var path = @"C:\Users\Home\Downloads\1.mp3";
-            ProcessStartInfo stream = new ProcessStartInfo
-            {
-
-                FileName = "ffmpeg",
-                Arguments = $"-hide_banner -loglevel panic -i \"{path}\" -ac 2 -f s16le -ar 48000 pipe:1",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = false
-            };
+            ProcessStartInfo stream = new ProcessStartInfo();
+            stream.FileName = "cmd.exe";
+            stream.WindowStyle = ProcessWindowStyle.Normal;
+            stream.Arguments = $"/k youtube-dl --no-check-certificate -f bestaudio -o - {url} | ffmpeg -i pipe:0 -f s16le -ar 48000 -ac 2 pipe:1";
+            stream.RedirectStandardOutput = true;
+            
             System.Console.WriteLine("bilded");
             return Process.Start(stream);
         }
